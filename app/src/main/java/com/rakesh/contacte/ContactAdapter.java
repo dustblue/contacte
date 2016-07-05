@@ -47,7 +47,7 @@ public class ContactAdapter extends ArrayAdapter<Contact>{
         Contact contact = data.get(position);
         holder.nameText.setText(contact.contactName);
         holder.numberText.setText(contact.contactNumber);
-        byte[] outImage=contact.contactImage;
+        byte[] outImage = contact.contactImage;
         ByteArrayInputStream imageStream = new ByteArrayInputStream(outImage);
         Bitmap theImage = BitmapFactory.decodeStream(imageStream);
         holder.contactImage.setImageBitmap(theImage);

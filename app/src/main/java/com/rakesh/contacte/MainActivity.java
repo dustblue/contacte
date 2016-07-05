@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(j);
+                finish();
             }
         });
         db = new DataBaseHandler(this);
-        db.getReadableDatabase();
         contacts = db.getAllContacts();
         for (Contact cn : contacts) {
             contact_data.add(cn);
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         contactList = (ListView) findViewById(R.id.contactList);
         adapter = new ContactAdapter(this, R.layout.custom_row, contact_data);
         contactList.setAdapter(adapter);
+
         contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -64,11 +66,12 @@ public class MainActivity extends AppCompatActivity {
                 j.putExtra("number", contacts.get(i).getNumber());
                 j.putExtra("image", contacts.get(i).getImage());
                 startActivity(j);
+                finish();
             }
         });
     }
 
-     Handler handler = new Handler() {
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(search_data!=null) {
@@ -79,19 +82,17 @@ public class MainActivity extends AppCompatActivity {
             }
             searchThread.interrupt();
         }
-     };
+    };
 
     private void displayResults(final String query) {
-        db = new DataBaseHandler(this);
-        db.getReadableDatabase();
         Runnable show = new Runnable() {
             @Override
             public void run() {
                 search_data = null;
                 for (Contact cnt : contacts) {
-                    if (cnt.getName().toLowerCase().contains(query.toLowerCase())||cnt.getNumber().contains(query.toLowerCase()))
+                    if (cnt.getName().toLowerCase().contains(query.toLowerCase())||cnt.getNumber().contains(query.toLowerCase())) {
                         search_data.add(cnt);
-                    else search_data = null;
+                    }
                 }
                 handler.sendEmptyMessage(0);
             }
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {

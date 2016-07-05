@@ -27,15 +27,14 @@ public class AddEdit extends AppCompatActivity {
     EditText editName;
     EditText editNumber;
     String name, number;
-    int id;
+    int id=0;
     Intent i;
     Toolbar bar;
-    private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
+    private int REQUEST_CAMERA = 0, SELECT_FILE = 1, EDIT_CODE = 1;
     ImageButton imageSelect;
     String userChosenTask;
     DataBaseHandler db;
     ByteArrayOutputStream bytes;
-    Bitmap thumbnail = null;
     Bundle editData;
 
     @Override
@@ -51,21 +50,23 @@ public class AddEdit extends AppCompatActivity {
         if(getSupportActionBar()!=null) {
             getSupportActionBar().setTitle("");
         }
-        thumbnail = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.default_contact);
-        bytes = new ByteArrayOutputStream();
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        imageSelect.setImageBitmap(thumbnail);
 
         i = new Intent(this, MainActivity.class);
-
         editData = getIntent().getExtras();
-        if(editData!=null) {
+        if (editData!=null) {
             editName.setText(editData.getString("name"));
             editNumber.setText(editData.getString("number"));
             id = editData.getInt("id");
             ByteArrayInputStream imageStream = new ByteArrayInputStream(editData.getByteArray("image"));
             Bitmap theImage = BitmapFactory.decodeStream(imageStream);
             imageSelect.setImageBitmap(theImage);
+            bytes = new ByteArrayOutputStream();
+            theImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        } else {
+            Bitmap thumbnail = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.default_contact);
+            bytes = new ByteArrayOutputStream();
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            imageSelect.setImageBitmap(thumbnail);
         }
 
         imageSelect.setOnClickListener(new View.OnClickListener() {
@@ -162,7 +163,7 @@ public class AddEdit extends AppCompatActivity {
     private void galleryIntent() {
         Intent intent = new Intent();
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);//
+        intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select File"),SELECT_FILE);
     }
 
@@ -194,7 +195,7 @@ public class AddEdit extends AppCompatActivity {
 
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
-
+        Bitmap thumbnail = null;
         if (data != null) {
             try {
                 thumbnail = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
